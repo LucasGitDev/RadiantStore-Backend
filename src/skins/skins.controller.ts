@@ -29,7 +29,7 @@ export class SkinsController {
   @Roles(RoleEnum.admin)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Post()
-  create(@Body() createSkinDto: CreateSkinDto) {
+  async create(@Body() createSkinDto: CreateSkinDto) {
     return this.skinsService.create(createSkinDto);
   }
 

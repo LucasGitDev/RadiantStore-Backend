@@ -86,5 +86,5 @@ export class Skin extends EntityHelper {
     eager: true,
   })
   @JoinColumn()
-  photo?: FileEntity | null;
+  image?: FileEntity | null;
 }
