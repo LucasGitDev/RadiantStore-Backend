@@ -33,23 +33,29 @@ export class SkinsController {
     return this.skinsService.create(createSkinDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   findAll() {
     return this.skinsService.findAll();
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.skinsService.findOne(+id);
+    return this.skinsService.findOne(id);
   }
 
+  @Roles(RoleEnum.admin)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSkinDto: UpdateSkinDto) {
-    return this.skinsService.update(+id, updateSkinDto);
+    return this.skinsService.update(id, updateSkinDto);
   }
 
+  @Roles(RoleEnum.admin)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.skinsService.remove(+id);
+    return this.skinsService.remove(id);
   }
 }

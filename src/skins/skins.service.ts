@@ -5,22 +5,22 @@ import { UpdateSkinDto } from './dto/update-skin.dto';
 @Injectable()
 export class SkinsService {
   create(createSkinDto: CreateSkinDto) {
-    return 'This action adds a new skin';
+    return createSkinDto;
   }
 
   findAll() {
     return `This action returns all skins`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} skin`;
   }
 
-  update(id: number, updateSkinDto: UpdateSkinDto) {
-    return `This action updates a #${id} skin`;
+  update(id: string, updateSkinDto: UpdateSkinDto) {
+    return { id, ...updateSkinDto };
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} skin`;
   }
 }
