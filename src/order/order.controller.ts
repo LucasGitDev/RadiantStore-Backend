@@ -7,6 +7,9 @@ import {
   Delete,
   Request,
   UseGuards,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -15,6 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/roles/roles.decorator';
 import { RoleEnum } from 'src/roles/roles.enum';
 import { RolesGuard } from 'src/roles/roles.guard';
+import { infinityPagination } from 'src/utils/infinity-pagination';
 
 @ApiBearerAuth()
 @ApiTags('Orders')
@@ -39,8 +43,25 @@ export class OrderController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Request() req,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+
+    return infinityPagination(
+      await this.orderService.findManyWithPagination(
+        {
+          page,
+          limit,
+        },
+        req.user,
+      ),
+      { page, limit },
+    );
   }
 
   @UseGuards(AuthGuard('jwt'))

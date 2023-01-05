@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RoleEnum } from 'src/roles/roles.enum';
 import { SkinsService } from 'src/skins/skins.service';
 import { User } from 'src/users/entities/user.entity';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from './entities/order.entity';
@@ -35,7 +36,9 @@ export class OrderService {
     });
 
     await this.ordersRepository.save(order);
-    await this.usersRepository.update(userId, { cart: [] });
+
+    user.cart = [];
+    await this.usersRepository.save(user);
 
     return order;
   }
@@ -62,8 +65,18 @@ export class OrderService {
     return cart;
   }
 
-  findAll() {
-    return `This action returns all order`;
+  async findManyWithPagination(
+    paginationOptions: IPaginationOptions,
+    user: any,
+  ): Promise<Order[]> {
+    const canSeeAllOrders = user.role.id === RoleEnum.admin;
+    const where = canSeeAllOrders ? {} : { user: { id: user.id } };
+    return this.ordersRepository.find({
+      where,
+      relations: ['user', 'skins'],
+      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      take: paginationOptions.limit,
+    });
   }
 
   findOne(id: string) {
