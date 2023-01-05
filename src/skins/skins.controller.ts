@@ -66,8 +66,8 @@ export class SkinsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.skinsService.findOne(id);
+  async findOne(@Param('id') id: string, @Request() req) {
+    return this.skinsService.findOne(id, req.user);
   }
 
   @Roles(RoleEnum.admin)

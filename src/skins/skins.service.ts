@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RoleEnum } from 'src/roles/roles.enum';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { ILike, Repository } from 'typeorm';
 import { CreateSkinDto } from './dto/create-skin.dto';
@@ -80,8 +81,13 @@ export class SkinsService {
     });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} skin`;
+  async findOne(id: string, user: any) {
+    const skin = await this.skinsRepository.findOne({ where: { id } });
+    if (!skin) throw new HttpException('skinNotFound', HttpStatus.NOT_FOUND);
+    console.log(user);
+    if (!skin.available && user?.role?.id !== RoleEnum.admin)
+      throw new HttpException('skinUnavailable', HttpStatus.FORBIDDEN);
+    return skin;
   }
 
   update(id: string, updateSkinDto: UpdateSkinDto) {
