@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import { ILike, Repository } from 'typeorm';
 import { CreateSkinDto } from './dto/create-skin.dto';
+import { SearchSkinDto } from './dto/search-skin.dto';
 import { UpdateSkinDto } from './dto/update-skin.dto';
 import { Rarity, Skin } from './entities/skin.entity';
 
@@ -44,8 +46,38 @@ export class SkinsService {
     );
   }
 
-  findAll() {
-    return `This action returns all skins`;
+  async findManyWithPagination(
+    paginationOptions: IPaginationOptions,
+    searchSkinDto: SearchSkinDto,
+    user: any,
+  ): Promise<Skin[]> {
+    if (searchSkinDto.order) {
+      const [orderField, orderType] = searchSkinDto.order.split(' ');
+      if (!['name', 'gun', 'rarity', 'price', 'available'].includes(orderField))
+        throw new HttpException('invalidOrderField', HttpStatus.BAD_REQUEST);
+      if (!['asc', 'desc'].includes(orderType))
+        throw new HttpException('invalidOrderType', HttpStatus.BAD_REQUEST);
+    }
+
+    const showUnavailableSkins = user?.role === 'admin';
+
+    return this.skinsRepository.find({
+      where: {
+        name: ILike(`%${searchSkinDto.name ?? ''}%`),
+        gun: searchSkinDto.gun,
+        rarity: searchSkinDto.rarity,
+        price: searchSkinDto.price,
+        available: searchSkinDto.available
+          ? searchSkinDto.available ?? showUnavailableSkins
+          : undefined,
+      },
+      order: {
+        [searchSkinDto.order?.split(' ')[0]]:
+          searchSkinDto.order?.split(' ')[1] === 'desc' ? 'DESC' : 'ASC',
+      },
+      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      take: paginationOptions.limit,
+    });
   }
 
   findOne(id: string) {
