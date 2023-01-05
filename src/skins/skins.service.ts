@@ -94,7 +94,7 @@ export class SkinsService {
     return { id, ...updateSkinDto };
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} skin`;
+  async remove(id: string) {
+    return this.skinsRepository.delete({ id });
   }
 }
