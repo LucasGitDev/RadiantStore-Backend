@@ -74,7 +74,7 @@ export class User extends EntityHelper {
   @Exclude({ toPlainOnly: true })
   hash: string | null;
 
-  @ManyToMany(() => Skin)
+  @ManyToMany(() => Skin, { eager: true })
   @JoinTable()
   cart: Skin[];
 

@@ -2,6 +2,7 @@ import { Skin } from 'src/skins/entities/skin.entity';
 import { User } from 'src/users/entities/user.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
+  BeforeInsert,
   Column,
   Entity,
   JoinTable,
@@ -27,6 +28,11 @@ export class Order extends EntityHelper {
 
   @Column({ nullable: true })
   total: number | null;
+
+  @BeforeInsert()
+  setTotal() {
+    this.total = this.skins.reduce((acc, skin) => acc + skin.price, 0);
+  }
 
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
   status: OrderStatus;

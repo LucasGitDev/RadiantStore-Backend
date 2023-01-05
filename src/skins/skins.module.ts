@@ -8,5 +8,6 @@ import { Skin } from './entities/skin.entity';
   imports: [TypeOrmModule.forFeature([Skin])],
   controllers: [SkinsController],
   providers: [SkinsService],
+  exports: [SkinsService],
 })
 export class SkinsModule {}
