@@ -10,12 +10,15 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 import { Status } from '../../statuses/entities/status.entity';
 import * as bcrypt from 'bcryptjs';
 import { EntityHelper } from 'src/utils/entity-helper';
 import { Exclude } from 'class-transformer';
+import { Skin } from 'src/skins/entities/skin.entity';
 
 @Entity()
 export class User extends EntityHelper {
@@ -68,6 +71,10 @@ export class User extends EntityHelper {
   @Index()
   @Exclude({ toPlainOnly: true })
   hash: string | null;
+
+  @ManyToMany(() => Skin)
+  @JoinTable()
+  cart: Skin[];
 
   @CreateDateColumn()
   createdAt: Date;
