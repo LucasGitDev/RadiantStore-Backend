@@ -90,8 +90,27 @@ export class SkinsService {
     return skin;
   }
 
-  update(id: string, updateSkinDto: UpdateSkinDto) {
-    return { id, ...updateSkinDto };
+  async update(id: string, updateSkinDto: UpdateSkinDto): Promise<Skin> {
+    const skin = await this.skinsRepository.findOne({ where: { id } });
+    if (!skin) throw new HttpException('skinNotFound', HttpStatus.NOT_FOUND);
+
+    if (
+      updateSkinDto.rarity === Rarity.EXCLUSIVE_EDITION &&
+      !updateSkinDto.price
+    )
+      throw new HttpException(
+        'exclusiveEditionPriceRequired',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    await this.skinsRepository.update(
+      { id },
+      {
+        ...updateSkinDto,
+      },
+    );
+
+    return this.skinsRepository.findOne({ where: { id } });
   }
 
   async remove(id: string) {

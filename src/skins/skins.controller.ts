@@ -73,7 +73,7 @@ export class SkinsController {
   @Roles(RoleEnum.admin)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSkinDto: UpdateSkinDto) {
+  async update(@Param('id') id: string, @Body() updateSkinDto: UpdateSkinDto) {
     return this.skinsService.update(id, updateSkinDto);
   }
 
