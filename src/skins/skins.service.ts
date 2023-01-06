@@ -84,7 +84,6 @@ export class SkinsService {
   async findOne(id: string, user: any) {
     const skin = await this.skinsRepository.findOne({ where: { id } });
     if (!skin) throw new HttpException('skinNotFound', HttpStatus.NOT_FOUND);
-    console.log(user);
     if (!skin.available && user?.role?.id !== RoleEnum.admin)
       throw new HttpException('skinUnavailable', HttpStatus.FORBIDDEN);
     return skin;
