@@ -4,11 +4,13 @@ import { EntityHelper } from 'src/utils/entity-helper';
 import {
   BeforeInsert,
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 export enum OrderStatus {
@@ -43,4 +45,10 @@ export class Order extends EntityHelper {
   @ManyToMany(() => Skin, { eager: true })
   @JoinTable()
   skins: Skin[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
