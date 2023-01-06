@@ -66,8 +66,8 @@ export class OrderController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(id);
+  findOne(@Param('id') id: string, @Request() req) {
+    return this.orderService.findOne(id, req.user);
   }
 
   @Roles(RoleEnum.admin)

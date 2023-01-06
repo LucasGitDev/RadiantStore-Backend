@@ -79,8 +79,13 @@ export class OrderService {
     });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} order`;
+  findOne(id: string, user: any) {
+    const canSeeAllOrders = user.role.id === RoleEnum.admin;
+    const where = canSeeAllOrders ? { id } : { id, user: { id: user.id } };
+    return this.ordersRepository.findOne({
+      where,
+      relations: ['user', 'skins'],
+    });
   }
 
   remove(id: string) {
