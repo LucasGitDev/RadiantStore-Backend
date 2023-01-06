@@ -42,6 +42,12 @@ export class OrderController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('remove/:id')
+  removeFromCart(@Param('id') id: string, @Request() req) {
+    return this.orderService.removeFromCart(id, req.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleEnum } from 'src/roles/roles.enum';
+import { Skin } from 'src/skins/entities/skin.entity';
 import { SkinsService } from 'src/skins/skins.service';
 import { User } from 'src/users/entities/user.entity';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
@@ -63,6 +64,16 @@ export class OrderService {
 
     await this.usersRepository.save(user);
     return cart;
+  }
+
+  async removeFromCart(skinId: string, userId: string): Promise<Skin[]> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
+
+    user.cart = user.cart.filter((s) => s.id !== skinId);
+    await this.usersRepository.save(user);
+    return user.cart;
   }
 
   async findManyWithPagination(
