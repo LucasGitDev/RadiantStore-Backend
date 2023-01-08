@@ -6,7 +6,9 @@ services:
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_DB: api_production
+    volumes:
+      - db:/var/lib/postgresql/data
 
   maildev:
     build:
@@ -25,3 +27,9 @@ services:
     build:
       context: .
       dockerfile: e2e.Dockerfile
+    ports:
+      - $APP_PORT:$APP_PORT
+
+volumes:
+  db:
+    driver: local

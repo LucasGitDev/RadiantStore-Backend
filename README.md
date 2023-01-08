@@ -8,6 +8,7 @@
 - [Links](#links)
 - [Database utils](#database-utils)
 - [Tests](#tests)
+- [Run Docker](#run-over-docker)
 
 ## Features
 
@@ -99,14 +100,10 @@ yarn seed:run
 sudo ./test-e2e.sh
 ```
 
-## Tests in Docker
+## Run Over Docker
+
+Required to have cloned backend and frontend with their respective names, at the same folder level
 
 ```bash
-docker compose -f docker-compose.ci.yaml --env-file env-example -p ci up --build --exit-code-from api && docker compose -p ci rm -svf
-```
-
-## Test benchmarking
-
-```bash
-docker run --rm jordi/ab -n 100 -c 100 -T application/json -H "Authorization: Bearer USER_TOKEN" -v 2 http://<server_ip>:3000/api/v1/users
+docker compose -f docker-compose.yaml --env-file env-example -p dev up --build --exit-code-from api
 ```
