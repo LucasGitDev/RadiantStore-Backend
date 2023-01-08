@@ -50,32 +50,38 @@ export class SkinsService {
   async findManyWithPagination(
     paginationOptions: IPaginationOptions,
     searchSkinDto: SearchSkinDto,
-    user: any,
+    user?: any,
   ): Promise<Skin[]> {
+    let haveOrderField;
+    let haveOrderType;
     if (searchSkinDto.order) {
-      const [orderField, orderType] = searchSkinDto.order.split(' ');
+      const [orderField, orderType] = searchSkinDto.order?.split(' ');
       if (!['name', 'gun', 'rarity', 'price', 'available'].includes(orderField))
         throw new HttpException('invalidOrderField', HttpStatus.BAD_REQUEST);
       if (!['asc', 'desc'].includes(orderType))
         throw new HttpException('invalidOrderType', HttpStatus.BAD_REQUEST);
+
+      haveOrderField = orderField;
+      haveOrderType = orderType;
     }
+
+    const order = {
+      [haveOrderField]: haveOrderType,
+    };
 
     const showUnavailableSkins = user?.role === 'admin';
 
     return this.skinsRepository.find({
       where: {
         name: ILike(`%${searchSkinDto.name ?? ''}%`),
-        gun: searchSkinDto.gun,
-        rarity: searchSkinDto.rarity,
-        price: searchSkinDto.price,
+        gun: searchSkinDto.gun ?? undefined,
+        rarity: searchSkinDto.rarity ?? undefined,
+        price: searchSkinDto.price ?? undefined,
         available: searchSkinDto.available
           ? searchSkinDto.available ?? showUnavailableSkins
           : undefined,
       },
-      order: {
-        [searchSkinDto.order?.split(' ')[0]]:
-          searchSkinDto.order?.split(' ')[1] === 'desc' ? 'DESC' : 'ASC',
-      },
+      order,
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
     });

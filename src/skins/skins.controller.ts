@@ -44,7 +44,7 @@ export class SkinsController {
       'Get all skins with pagination. To filter, define only the desired fields in the body.',
   })
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @Post('search')
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -63,6 +63,32 @@ export class SkinsController {
         },
         searchSkinDto,
         req.user,
+      ),
+      { page, limit },
+    );
+  }
+
+  @ApiOperation({
+    description:
+      'Get all skins with pagination (for no authenticated requests). To filter, define only the desired fields in the body.',
+  })
+  @Post('search/not-logged-in')
+  async searchNotLogedIn(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Body() searchSkinDto: SearchSkinDto,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+
+    return infinityPagination(
+      await this.skinsService.findManyWithPagination(
+        {
+          page,
+          limit,
+        },
+        searchSkinDto,
       ),
       { page, limit },
     );
