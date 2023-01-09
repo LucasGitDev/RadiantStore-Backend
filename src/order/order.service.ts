@@ -76,6 +76,15 @@ export class OrderService {
     return user.cart;
   }
 
+  async getCart(userId: string): Promise<Skin[]> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['cart'],
+    });
+
+    return user.cart;
+  }
+
   async findManyWithPagination(
     paginationOptions: IPaginationOptions,
     user: any,
