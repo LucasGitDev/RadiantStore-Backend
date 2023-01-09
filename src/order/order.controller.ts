@@ -48,6 +48,12 @@ export class OrderController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('get')
+  getCart(@Request() req) {
+    return this.orderService.getCart(req.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
