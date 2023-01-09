@@ -8,6 +8,7 @@
 - [Links](#links)
 - [Database utils](#database-utils)
 - [Tests](#tests)
+- [Run Docker](#run-over-docker)
 
 ## Features
 
@@ -16,20 +17,28 @@
 - [X] Config Service ([@nestjs/config](https://www.npmjs.com/package/@nestjs/config)).
 - [X] Mailing ([nodemailer](https://www.npmjs.com/package/nodemailer), [@nestjs-modules/mailer](https://www.npmjs.com/package/@nestjs-modules/mailer)).
 - [X] Sign in and sign up via email.
+- [X] JWT Auth
 - [X] Admin and User roles.
 - [X] I18N ([nestjs-i18n](https://www.npmjs.com/package/nestjs-i18n)).
 - [X] File uploads. Support local and Amazon S3 drivers.
 - [X] Swagger.
 - [X] E2E and units tests.
 - [X] Docker.
+- [X] Skins CRUD
+- [X] Initial setup of a e-commerce
+- [X] Order CRUD
+- [X] Add and Remove Skin from Cart
+- [X] Pagination
+- [X] Ordering of query results
 
 ## Quick run
 
 ```bash
-git clone GIT_REPO
-cd GIT_REPO
+git clone GIT_REPO_BACKEND backend
+git clone GIT_REPO_FRONTEND frontend
+cd backend
 cp env-example .env
-#config it
+#config it if needed
 docker compose up -d
 ```
 
@@ -54,6 +63,10 @@ yarn seed:run
 
 yarn start:dev
 ```
+
+## Important
+
+If a new user was created, it will not be active. To activate the user, open Maildev and confirm the email.
 
 ## Links
 
@@ -94,19 +107,17 @@ yarn seed:run
 
 ## Tests
 
+Only Skin and Order do not have e2e tests.
+
 ```bash
 # e2e tests
 sudo ./test-e2e.sh
 ```
 
-## Tests in Docker
+## Run Over Docker
+
+Required to have cloned backend and frontend with their respective names, at the same folder level
 
 ```bash
-docker compose -f docker-compose.ci.yaml --env-file env-example -p ci up --build --exit-code-from api && docker compose -p ci rm -svf
-```
-
-## Test benchmarking
-
-```bash
-docker run --rm jordi/ab -n 100 -c 100 -T application/json -H "Authorization: Bearer USER_TOKEN" -v 2 http://<server_ip>:3000/api/v1/users
+docker compose -f docker-compose.yaml --env-file env-example -p dev up --build --exit-code-from api
 ```

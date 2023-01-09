@@ -1,0 +1,116 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
+  Request,
+} from '@nestjs/common';
+import { SkinsService } from './skins.service';
+import { CreateSkinDto } from './dto/create-skin.dto';
+import { UpdateSkinDto } from './dto/update-skin.dto';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/roles/roles.decorator';
+import { RoleEnum } from 'src/roles/roles.enum';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/roles/roles.guard';
+import { infinityPagination } from 'src/utils/infinity-pagination';
+import { SearchSkinDto } from './dto/search-skin.dto';
+
+@ApiBearerAuth()
+@ApiTags('Skins')
+@Controller({
+  path: 'skins',
+  version: '1',
+})
+export class SkinsController {
+  constructor(private readonly skinsService: SkinsService) {}
+
+  @Roles(RoleEnum.admin)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Post()
+  async create(@Body() createSkinDto: CreateSkinDto) {
+    return this.skinsService.create(createSkinDto);
+  }
+
+  @ApiOperation({
+    description:
+      'Get all skins with pagination. To filter, define only the desired fields in the body.',
+  })
+  @UseGuards(AuthGuard('jwt'))
+  @Post('search')
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Body() searchSkinDto: SearchSkinDto,
+    @Request() req,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+
+    return infinityPagination(
+      await this.skinsService.findManyWithPagination(
+        {
+          page,
+          limit,
+        },
+        searchSkinDto,
+        req.user,
+      ),
+      { page, limit },
+    );
+  }
+
+  @ApiOperation({
+    description:
+      'Get all skins with pagination (for no authenticated requests). To filter, define only the desired fields in the body.',
+  })
+  @Post('search/not-logged-in')
+  async searchNotLogedIn(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Body() searchSkinDto: SearchSkinDto,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+
+    return infinityPagination(
+      await this.skinsService.findManyWithPagination(
+        {
+          page,
+          limit,
+        },
+        searchSkinDto,
+      ),
+      { page, limit },
+    );
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Request() req) {
+    return this.skinsService.findOne(id, req.user);
+  }
+
+  @Roles(RoleEnum.admin)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateSkinDto: UpdateSkinDto) {
+    return this.skinsService.update(id, updateSkinDto);
+  }
+
+  @Roles(RoleEnum.admin)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return this.skinsService.remove(id);
+  }
+}
